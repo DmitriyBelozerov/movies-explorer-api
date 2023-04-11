@@ -15,7 +15,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const checkErrors = require('./middlewares/checkErrors');
 const NotFoundError = require('./errors/not-found-err');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, BD } = process.env;
 
 const allowedCors = [
   // 'https://dmbelozerov.nomoredomainsclub.ru',
@@ -23,8 +23,6 @@ const allowedCors = [
   'http://localhost:3000',
   'http://localhost:3001',
 ];
-
-
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -34,7 +32,7 @@ const limiter = rateLimit({
 });
 
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://localhost:27017/myfilmsdb');
+mongoose.connect(BD);
 
 app.use(helmet());
 app.use(limiter);
@@ -68,4 +66,3 @@ app.use(errors());
 app.use(checkErrors);
 
 app.listen(PORT);
-console.log(`сервер запущен, порт: ${PORT}`)

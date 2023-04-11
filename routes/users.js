@@ -1,9 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 
-const { getСurrentUser, updateUser, } = require('../controllers/users.js');
-
-// const regEx = /(https?:\/\/)(w{3}\.)?([a-zA-Z0-9-]{0,100}\.)([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
+const { getСurrentUser, updateUser } = require('../controllers/users');
 
 router.get(
   '/me',

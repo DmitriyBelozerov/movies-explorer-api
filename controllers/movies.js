@@ -17,17 +17,29 @@ const getMovies = (req, res, next) => {
 
 const createMovie = (req, res, next) => {
   const {
-    country, director, duration, year, description, image, trailerLink, thumbnail, movieId, nameRU, nameEN
+    country, director, duration, year, description, image,
+    trailerLink, thumbnail, movieId, nameRU, nameEN,
   } = req.body;
   Movie.create({
-    country, director, duration, year, description, image, trailerLink, thumbnail, movieId, nameRU, nameEN, owner: req.user._id
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+    owner: req.user._id,
   })
     .then((movie) => {
       res.status(NO_ERRORS_CREATED).send({ data: movie });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при создании карточки'));
+        next(new ValidationError('Переданы некорректные данные при сохранении фильма'));
       } else {
         next(err);
       }
@@ -40,7 +52,7 @@ const deleteMovie = (req, res, next) => {
       if (!movie) {
         throw new NotFoundError('Карточка не найдена');
       } else if (!movie.owner.equals(req.user._id)) {
-        throw new UserAccessError('Нельзя удалять карточки других пользователей');
+        throw new UserAccessError('Нельзя удалять фильмы других пользователей');
       } else {
         Movie.deleteOne(movie)
           .then(() => {
@@ -51,7 +63,7 @@ const deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные при удалении карточки'));
+        next(new ValidationError('Переданы некорректные данные при удалении'));
       } else {
         next(err);
       }
@@ -59,5 +71,5 @@ const deleteMovie = (req, res, next) => {
 };
 
 module.exports = {
-  getMovies, createMovie, deleteMovie
+  getMovies, createMovie, deleteMovie,
 };

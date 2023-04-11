@@ -61,10 +61,27 @@ const unLogin = (req, res, next) => {
   }
 };
 
+const findUser = (req, res, next, id) => {
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.status(NO_ERRORS).send({ data: user });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ValidationError('Переданы некорректные данные при запросе пользователя'));
+      } else {
+        next(err);
+      }
+    });
+};
+
 const getСurrentUser = (req, res, next) => {
   findUser(req, res, next, req.user._id);
 };
-
 
 const findUserForUpdated = (req, res, next, info) => {
   User.findByIdAndUpdate(req.user._id, info, { new: true, runValidators: true })
@@ -86,16 +103,13 @@ const findUserForUpdated = (req, res, next, info) => {
 
 const updateUser = (req, res, next) => {
   const { name, email } = req.body;
-  findUserForUpdated(req, res, next, { name, email });
+  findUserForUpdated(req, res, next, { name, email: email.toLowerCase() });
 };
 
 module.exports = {
-  // getUsers,
   getСurrentUser,
-  // getUserById,
   createUser,
   updateUser,
-  // updateAvatar,
   login,
   unLogin,
 };

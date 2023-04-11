@@ -36,10 +36,8 @@ router.post(
   unLogin,
 );
 
-
 router.use(auth);
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
-
 
 module.exports = router;
