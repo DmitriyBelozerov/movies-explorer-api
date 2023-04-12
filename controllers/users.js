@@ -55,7 +55,6 @@ const unLogin = (req, res, next) => {
   try {
     res.clearCookie('jwt');
     res.status(NO_ERRORS).send({ message: 'Вы успешно вышли из системы' });
-    res.end();
   } catch (err) {
     next(err);
   }
@@ -95,6 +94,8 @@ const findUserForUpdated = (req, res, next, info) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные при обновлении профиля пользователя'));
+      } else if (err.code === 11000) {
+        next(new UniqueEmailError('Пользователь с таким Email уже существует'));
       } else {
         next(err);
       }

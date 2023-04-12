@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
@@ -13,33 +12,25 @@ const app = express();
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const checkErrors = require('./middlewares/checkErrors');
-const NotFoundError = require('./errors/not-found-err');
+const limiter = require('./middlewares/limiter');
 
-const { PORT = 3000, BD } = process.env;
+const { PORT = 3000, BD = 'mongodb://localhost:27017/myfilmsdb' } = process.env;
 
 const allowedCors = [
-  // 'https://dmbelozerov.nomoredomainsclub.ru',
-  // 'http://dmbelozerov.nomoredomainsclub.ru',
+  'https://belozerov.nomoredomains.monster',
+  'http://belozerov.nomoredomains.monster',
   'http://localhost:3000',
   'http://localhost:3001',
 ];
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
 mongoose.set('strictQuery', false);
 mongoose.connect(BD);
 
+app.use(requestLogger);
 app.use(helmet());
 app.use(limiter);
 app.use(bodyParser.json());
 app.use(cookieParser());
-
-app.use(requestLogger);
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
@@ -59,7 +50,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/', router);
-app.use('*', (req, res, next) => next(new NotFoundError('Страница не существует')));
 
 app.use(errorLogger);
 app.use(errors());
