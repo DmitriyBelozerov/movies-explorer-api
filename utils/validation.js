@@ -27,7 +27,7 @@ const validationCreateMovie = celebrate({
     image: Joi.string().required().pattern(regEx),
     trailerLink: Joi.string().required().pattern(regEx),
     thumbnail: Joi.string().required().pattern(regEx),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().unsafe().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),
@@ -35,7 +35,7 @@ const validationCreateMovie = celebrate({
 
 const validationDeleteMovie = celebrate({
   params: Joi.object().keys({
-    movieId: Joi.string().required(),
+    _id: Joi.string().hex().length(24).required(),
   }),
 });
 

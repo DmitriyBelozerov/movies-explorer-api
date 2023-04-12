@@ -23,9 +23,10 @@ router.post(
 );
 
 router.use(auth);
-router.post('/signout', unLogin);
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
+router.post('/signout', unLogin);
+
 router.use('*', (req, res, next) => next(new NotFoundError('Страница не существует')));
 
 module.exports = router;
