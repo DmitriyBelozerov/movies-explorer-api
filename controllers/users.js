@@ -8,6 +8,10 @@ const NO_ERRORS = 200;
 const NotFoundError = require('../errors/not-found-err');
 const UniqueEmailError = require('../errors/unique-email-err');
 const ValidationError = require('../errors/validation-err');
+const {
+  messageSuccessfullyLoggedOut, messageUserNotFound, messageIncorrectDataGetUser,
+  messageIncorrectDataUpdateUser, messageEmailСonflict,
+} = require('../constants/constants');
 
 const createUser = (req, res, next) => {
   const { name, email } = req.body;
@@ -54,7 +58,7 @@ const login = (req, res, next) => {
 const unLogin = (req, res, next) => {
   try {
     res.clearCookie('jwt');
-    res.status(NO_ERRORS).send({ message: 'Вы успешно вышли из системы' });
+    res.status(NO_ERRORS).send({ message: messageSuccessfullyLoggedOut });
   } catch (err) {
     next(err);
   }
@@ -64,14 +68,14 @@ const findUser = (req, res, next, id) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        throw new NotFoundError(messageUserNotFound);
       } else {
         res.status(NO_ERRORS).send({ data: user });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные при запросе пользователя'));
+        next(new ValidationError(messageIncorrectDataGetUser));
       } else {
         next(err);
       }
@@ -86,16 +90,16 @@ const findUserForUpdated = (req, res, next, info) => {
   User.findByIdAndUpdate(req.user._id, info, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        throw new NotFoundError(messageUserNotFound);
       } else {
         res.status(NO_ERRORS).send({ data: user });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные при обновлении профиля пользователя'));
+        next(new ValidationError(messageIncorrectDataUpdateUser));
       } else if (err.code === 11000) {
-        next(new UniqueEmailError('Пользователь с таким Email уже существует'));
+        next(new UniqueEmailError(messageEmailСonflict));
       } else {
         next(err);
       }

@@ -2,6 +2,10 @@ const Movie = require('../models/movie');
 const NotFoundError = require('../errors/not-found-err');
 const UserAccessError = require('../errors/user-access-err');
 const ValidationError = require('../errors/validation-err');
+const {
+  messageIncorrectDataCreateMovie, messageMovieNotFound, messageAccessСonflict,
+  messageIncorrectDataDeleteMovie,
+} = require('../constants/constants');
 
 const NO_ERRORS = 200;
 const NO_ERRORS_CREATED = 201;
@@ -10,7 +14,9 @@ const getMovies = (req, res, next) => {
   Movie.find({})
     .populate(['owner'])
     .then((movies) => {
-      res.status(NO_ERRORS).send({ data: movies });
+      res.status(NO_ERRORS).send({
+        data: movies.filter((movie) => movie.owner.equals(req.user._id)),
+      });
     })
     .catch(next);
 };
@@ -39,7 +45,7 @@ const createMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при сохранении фильма'));
+        next(new ValidationError(messageIncorrectDataCreateMovie));
       } else {
         next(err);
       }
@@ -50,9 +56,9 @@ const deleteMovie = (req, res, next) => {
   Movie.findById(req.params._id)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError('Карточка не найдена');
+        throw new NotFoundError(messageMovieNotFound);
       } else if (!movie.owner.equals(req.user._id)) {
-        throw new UserAccessError('Нельзя удалять фильмы других пользователей');
+        throw new UserAccessError(messageAccessСonflict);
       } else {
         movie.remove()
           .then(() => {
@@ -63,7 +69,7 @@ const deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные при удалении'));
+        next(new ValidationError(messageIncorrectDataDeleteMovie));
       } else {
         next(err);
       }

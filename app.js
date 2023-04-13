@@ -9,19 +9,14 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+const { dataBaseDev } = require('./constants/constants');
 const router = require('./routes/index');
+const { checkCorsVerification } = require('./utils/cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const checkErrors = require('./middlewares/checkErrors');
 const limiter = require('./middlewares/limiter');
 
-const { PORT = 3000, BD = 'mongodb://localhost:27017/myfilmsdb' } = process.env;
-
-const allowedCors = [
-  'https://belozerov.nomoredomains.monster',
-  'http://belozerov.nomoredomains.monster',
-  'http://localhost:3000',
-  'http://localhost:3001',
-];
+const { PORT = 3000, BD = dataBaseDev } = process.env;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(BD);
@@ -32,22 +27,7 @@ app.use(limiter);
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-  const { method } = req;
-  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-  const requestHeaders = req.headers['access-control-request-headers'];
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', true);
-  }
-  if (method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    return res.end();
-  }
-  return next();
-});
+app.use(checkCorsVerification);
 
 app.use('/', router);
 
