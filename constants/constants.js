@@ -16,6 +16,7 @@ const message404 = 'Страница не существует';
 const allowedCors = [
   'https://belozerov.nomoredomains.monster',
   'http://belozerov.nomoredomains.monster',
+  'https://api.nomoreparties.co/beatfilm-movies',
   'http://localhost:3000',
   'http://localhost:3001',
 ];
