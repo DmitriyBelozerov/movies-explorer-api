@@ -16,7 +16,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const checkErrors = require('./middlewares/checkErrors');
 const limiter = require('./middlewares/limiter');
 
-const { PORT = 3000, BD = dataBaseDev } = process.env;
+const { PORT = 3001, BD = dataBaseDev } = process.env;
 
 mongoose.set('strictQuery', false);
 mongoose.connect(BD);
