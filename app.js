@@ -36,3 +36,4 @@ app.use(errors());
 app.use(checkErrors);
 
 app.listen(PORT);
+console.log(PORT);
